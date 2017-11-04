@@ -22,7 +22,7 @@ from sklearn.preprocessing import LabelEncoder
 
 from numba import jit
 
-n_splits = 3
+n_splits = 5
 
 # Evaluate Result
 
