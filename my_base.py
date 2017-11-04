@@ -214,8 +214,8 @@ train = train.drop(col_to_drop, axis=1)
 test = test.drop(col_to_drop, axis=1)
 
 
-# train = train.drop(['ps_ind_14'], axis=1)
-# test = test.drop(['ps_ind_14'], axis=1)
+train = train.drop(['ps_ind_14'], axis=1)
+test = test.drop(['ps_ind_14'], axis=1)
 
 train = pd.concat([train, train_calc_09], axis=1)
 test = pd.concat([test, test_calc_09], axis=1)
@@ -344,7 +344,7 @@ print(train.values.shape, test.values.shape)
 onezero_featrue = {
     'ps_ind_01',
     'ps_ind_03',
-    'ps_ind_14',
+#     'ps_ind_14',
     'ps_ind_15',
     'ps_reg_01',
     'ps_reg_02',
