@@ -230,7 +230,7 @@ combs = [
 
 start = time.time()
 for n_c, (f1, f2) in enumerate(combs):
-    name1 = f1 + "_plus_" + f2 + "done"
+    name1 = f1 + "_plus_" + f2
     print('current feature %60s %4d in %5.1f'
           % (name1, n_c + 1, (time.time() - start) / 60), end='')
     print('\r' * 75, end='')
