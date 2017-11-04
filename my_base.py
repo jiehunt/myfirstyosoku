@@ -4,8 +4,11 @@ import numpy as np
 import time
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
+from sklearn import *
 
 from xgboost import XGBClassifier
+
+import xgboost as xgb
 from lightgbm import LGBMClassifier
 # from catboost import CatBoostClassifier
 from sklearn.preprocessing import minmax_scale
@@ -48,6 +51,16 @@ def gini_xgb(preds, dtrain):
     labels = dtrain.get_label()
     gini_score = -eval_gini(labels, preds)
     return [('gini', gini_score)]
+
+## from zehhan
+def gini_ze(y, pred):
+    fpr, tpr, thr = metrics.roc_curve(y, pred, pos_label=1)
+    g = 2 * metrics.auc(fpr, tpr) -1
+    return g
+
+def gini_xgb_ze(pred, y):
+    y = y.get_label()
+    return 'gini', gini_ze(y, pred)
 
 def gini_lgb(preds, dtrain):
     y = list(dtrain.get_label())
@@ -117,7 +130,7 @@ class Ensemble(object):
         self.stacker = stacker
         self.base_models = base_models
 
-    def fit_predict(self, X, y, T):
+    def fit_predict(self, X, y, T, id):
         t_X = X
         X = np.array(X)
         y = np.array(y)
@@ -162,6 +175,10 @@ class Ensemble(object):
 
         self.stacker.fit(S_train, y)
         pred = self.stacker.predict_proba(S_train)[:,1]
+        tmp = pd.DataFrame()
+        tmp['target'] = pred
+        tmp['id'] = id
+        tmp.to_csv('mybase_valid.csv', float_format='%.6f', index=False)
         print( "  Total Gini = ", eval_gini(y, pred) )
 
         res = self.stacker.predict_proba(S_test)[:,1]
@@ -173,6 +190,7 @@ class Ensemble(object):
 train = pd.read_csv('../train/train.csv')
 test = pd.read_csv('../test/test.csv')
 
+id_train = train['id'].values
 id_test = test['id'].values
 target_train = train['target'].values
 y_train = train['target']
@@ -212,7 +230,7 @@ combs = [
 
 start = time.time()
 for n_c, (f1, f2) in enumerate(combs):
-    name1 = f1 + "_plus_" + f2
+    name1 = f1 + "_plus_" + f2 + "done"
     print('current feature %60s %4d in %5.1f'
           % (name1, n_c + 1, (time.time() - start) / 60), end='')
     print('\r' * 75, end='')
@@ -234,18 +252,18 @@ for n_c, (f1, f2) in enumerate(combs):
 ##Categorical variable
 
 
-# cat_features = [a for a in train.columns if a.endswith('cat')]
-#
-# for column in cat_features:
-#     temp = pd.get_dummies(pd.Series(train[column]))
-#         #One-Hot Encoding:convert category to dummy/indicator variables
-#     train = pd.concat([train, temp], axis=1)
-#     train = train.drop([column], axis=1) #remove original one
-#
-# for column in cat_features:
-#     temp = pd.get_dummies(pd.Series(test[column])) #One-Hot Encoding
-#     test = pd.concat([test, temp], axis=1)
-#     test = test.drop([column], axis=1)
+cat_features = [a for a in train.columns if a.endswith('cat')]
+
+for column in cat_features:
+    temp = pd.get_dummies(pd.Series(train[column]), prefix=column)
+        #One-Hot Encoding:convert category to dummy/indicator variables
+    train = pd.concat([train, temp], axis=1)
+    train = train.drop([column], axis=1) #remove original one
+
+for column in cat_features:
+    temp = pd.get_dummies(pd.Series(test[column]), prefix=column) #One-Hot Encoding
+    test = pd.concat([test, temp], axis=1)
+    test = test.drop([column], axis=1)
 
 
 
@@ -305,18 +323,19 @@ test = pd.concat([test, car_age_t.rename('ps_reg_03_square')], axis=1)
 # test = test.drop(['ps_car_15'], axis=1)
 
 cat_features = [a for a in train.columns if a.endswith('cat')]
-cat_features.remove('ps_car_11_cat')
+print(cat_features)
+# cat_features.remove('ps_car_11_cat')
 
-for column in cat_features:
-    temp = pd.get_dummies(pd.Series(train[column]))
-        #One-Hot Encoding:convert category to dummy/indicator variables
-    train = pd.concat([train, temp], axis=1)
-    train = train.drop([column], axis=1) #remove original one
-
-for column in cat_features:
-    temp = pd.get_dummies(pd.Series(test[column])) #One-Hot Encoding
-    test = pd.concat([test, temp], axis=1)
-    test = test.drop([column], axis=1)
+# for column in cat_features:
+#     temp = pd.get_dummies(pd.Series(train[column]))
+#         #One-Hot Encoding:convert category to dummy/indicator variables
+#     train = pd.concat([train, temp], axis=1)
+#     train = train.drop([column], axis=1) #remove original one
+#
+# for column in cat_features:
+#     temp = pd.get_dummies(pd.Series(test[column])) #One-Hot Encoding
+#     test = pd.concat([test, temp], axis=1)
+#     test = test.drop([column], axis=1)
 
 
 print(train.values.shape, test.values.shape)
@@ -376,6 +395,35 @@ train = train.replace(-1, np.nan)
 test = test.replace(-1, np.nan)
 
 ###Model Selection
+
+## get this from zeeshan
+params = {'eta': 0.02,
+          'max_depth': 4,
+          'subsample': 0.9,
+          'colsample_bytree': 0.9,
+          'objective': 'binary:logistic',
+          'eval_metric': 'auc',
+          'seed': 99,
+          'gpu_id' : 0,
+          'max_bin' : 16,
+          'tree_method' : 'gpu_hist',
+          'silent': True}
+
+x1, x2, y1, y2 = model_selection.train_test_split(train, y_train, test_size=0.25, random_state=99)
+
+col = [c for c in x1.columns if c not in ['id','target']]
+
+print("goto XGB Boost Part !!!")
+# watchlist = [(xgb.DMatrix(x1, y1), 'train'), (xgb.DMatrix(x2, y2), 'valid')]
+# model = xgb.train(params, xgb.DMatrix(x1, y1), 5000,  watchlist, feval=gini_xgb_ze, maximize=True, verbose_eval=50, early_stopping_rounds=200)
+# print("goto Predict ")
+# # test['target'] = model.predict(xgb.DMatrix(test[col]), ntree_limit=model.best_ntree_limit+45)
+# test['target'] = model.predict(xgb.DMatrix(test[col]), ntree_limit=model.best_ntree_limit+45)
+# test['target'] = (np.exp(test['target'].values) - 1.0).clip(0,1)
+# test_1 = pd.concat((test['target'], id_test['id']), axis=1)
+# test_1[['id','target']].to_csv('xgb_submission.csv', index=False, float_format='%.5f')
+
+
 
 # LightGBM params
 lgb_params = {}
@@ -491,12 +539,7 @@ stack = Ensemble(n_splits=n_splits,
 # stacker = log_model,
 # base_models = (lgb_model, lgb_model2, lgb_model3, xgb_model))
 
-y_pred = stack.fit_predict(train, target_train, test)
-
-
-
-
-
+y_pred = stack.fit_predict(train, target_train, test, id_train)
 
 ###Output resault
 
