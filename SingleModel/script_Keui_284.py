@@ -126,9 +126,12 @@ sub['id'] = testid
 params = {'eta': 0.025, 'max_depth': 4, 
           'subsample': 0.9, 'colsample_bytree': 0.7, 
           'colsample_bylevel':0.7,
-            'min_child_weight':100,
-            'alpha':4,
-            'objective': 'binary:logistic', 'eval_metric': 'auc', 'seed': 99, 'silent': True}
+          'min_child_weight':100,
+          'alpha':4,
+          'gpu_id':0,
+          'max_bin' : 16,
+          'tree_method': 'gpu_hist',
+          'objective': 'binary:logistic', 'eval_metric': 'auc', 'seed': 99, 'silent': True}
 x1, x2, y1, y2 = train_test_split(train, y, test_size=0.25, random_state=99)
 
 
