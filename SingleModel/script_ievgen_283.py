@@ -148,8 +148,11 @@ for i in range(0, n_iterations):
               'max_depth': choice([3, 4, 5, 6, 7, 9, 11]),       
               'feature_fraction': choice([0.5, 0.7, 0.8, 0.9]),
               'lambda_l1': choice([0, 10, 20, 30, 40]),
-              'objective': 'binary', 
-              'metric': 'auc'} 
+              'objective': 'binary',
+              'device':'gpu',
+              'gpu_platform_id': 0,
+              'gpu_device_id': 0,
+              'metric': 'auc'}
     
     gini_norm = []
     roc_l = []
