@@ -69,6 +69,9 @@ params = {'learning_rate': 0.1,
           'metric': 'auc',
           'is_training_metric': False,
           'seed': 99,
+          'device':'gpu',
+          'gpu_platform_id': 0,
+          'gpu_device_id': 0,
           'verbose': -1}
 #____________
 NB_models  = 2
