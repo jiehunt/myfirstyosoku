@@ -22,7 +22,9 @@ import xgboost as xgb
 train = pd.read_csv('../input/train.csv')
 test = pd.read_csv('../input/test.csv')
 
-### 
+train_valid = pd.DataFrame()
+train_valid['id'] = train['id'].values
+###
 y = train['target'].values
 testid= test['id'].values
 
@@ -141,7 +143,11 @@ model = xgb.train(params, xgb.DMatrix(x1, y1), 5000,  watchlist, feval=gini_xgb,
                   verbose_eval=100, early_stopping_rounds=70)
 sub['target'] = model.predict(xgb.DMatrix(test), ntree_limit=model.best_ntree_limit)
 
+train_valid['target'] = model.predict(xgb.DMatrix(train), ntree_limit=model.best_ntree_limit)
+
+train_valid.to_csv('Keui_valid.csv', index=False)
+
 ### Submission
 
 sub['target'] = model.predict(xgb.DMatrix(test), ntree_limit=model.best_ntree_limit)
-sub.to_csv('Froza_and_Pascal.csv',index=False)
+sub.to_csv('Keui_submit.csv',index=False)
