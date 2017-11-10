@@ -116,24 +116,29 @@ for num_mod, model_name in enumerate(path_model):
     prediction_test['target'] = predictions / kfold
     fichier = path_model[num_mod]+'_pred_test.csv'
     prediction_test.to_csv(fichier, index=False)
+    fichier = 'Fabien'+path_model[num_mod]+'_submit.csv'
+    prediction_test.to_csv(fichier, index=False)
 
 print("--- elapsed time {} seconds ---".format(time.time() - start_time))
 #=========================================================
 # IV. Load LGBM models results
 #=========================================================
-def read_folds(nfolds, fichier):
+def read_folds(nfolds, fichier, num):
     df_model = pd.DataFrame()
     for j in range(nfolds):    
         fichier_fold = fichier + '_pred_valid_fold_{}-{}.csv'.format(j+1, nfolds)
         df = pd.read_csv(fichier_fold)
         df_model = pd.concat([df, df_model])
     df_model.sort_values('id', inplace = True)
+    df_model.to_csv('Febien_{}_valid.csv'.format(n), float_format='%.6f', index=False)
     df_model = df_model.reset_index(drop = True)
     return df_model
 #__________________________________________
 df_model = []
-for model_directory in path_model:    
-    df_model.append(read_folds(kfold, model_directory))  
+n = 0
+for model_directory in path_model:
+    df_model.append(read_folds(kfold, model_directory, n))
+    n += 1
 #__________________________________________
 print("Individual gini's scores:")
 for i, model in enumerate(path_model):
@@ -207,7 +212,7 @@ for i in range(NB_models):
 submit = pd.DataFrame()
 submit['id'] = id_test
 submit['target'] = avg 
-submit.to_csv('submission.csv', index=False)
+submit.to_csv('Febien_submission.csv', index=False)
 
 
     
