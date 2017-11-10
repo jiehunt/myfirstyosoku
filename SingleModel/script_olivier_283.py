@@ -94,8 +94,12 @@ def target_encode(trn_series=None,
 
 gc.enable()
 
-trn_df = pd.read_csv("../input/train.csv", index_col=0)
-sub_df = pd.read_csv("../input/test.csv", index_col=0)
+# trn_df = pd.read_csv("../input/train.csv", index_col=0)
+# sub_df = pd.read_csv("../input/test.csv", index_col=0)
+trn_df = pd.read_csv("../input/train.csv")
+sub_df = pd.read_csv("../input/test.csv")
+
+train_valid = trn_df["id"]
 
 target = trn_df["target"]
 del trn_df["target"]
@@ -234,8 +238,12 @@ for fold_, (trn_idx, val_idx) in enumerate(folds.split(target, target)):
              best_round))
              
     # Update submission
-    sub_preds += clf.predict_proba(sub_df)[:, 1] / n_splits 
-          
+    sub_preds += clf.predict_proba(sub_df)[:, 1] / n_splits
+
+
+train_valid["target"] = clf.predict_proba(trn_df)[:, 1]
+train_valid.to_csv("olivier_valid.csv", index=False)
+
 print("Full OOF score : %.6f" % eval_gini(target, oof))
 
 # Compute mean score and std
@@ -252,4 +260,4 @@ for i, imp in enumerate(importances):
     
 sub_df["target"] = sub_preds
 
-sub_df[["target"]].to_csv("submission.csv", index=True, float_format="%.9f")
+sub_df[["target"]].to_csv("olivier_submit.csv", index=True, float_format="%.9f")
