@@ -99,7 +99,8 @@ gc.enable()
 trn_df = pd.read_csv("../input/train.csv")
 sub_df = pd.read_csv("../input/test.csv")
 
-train_valid = trn_df["id"]
+train_valid = pd.DataFrame()
+train_valid["id"] = trn_df["id"]
 
 target = trn_df["target"]
 del trn_df["target"]
