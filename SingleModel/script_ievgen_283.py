@@ -250,7 +250,7 @@ for i in range(0, len(prms_list)):
 
 train_res = pd.DataFrame({"id": df_tn_z['id'].values})
 train_res['target'] = train_target
-pred_df.to_csv("ievgen_valid.csv", index = False)
+train_res.to_csv("ievgen_valid.csv", index = False)
 
 pred_df['target'] = target
 # pred_df.to_csv("lgbm_5m.csv", index = False)
