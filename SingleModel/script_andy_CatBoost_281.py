@@ -106,11 +106,11 @@ print(eval_gini(y, y_valid_pred))
 val = pd.DataFrame()
 val['id'] = id_train
 val['target'] = y_valid_pred.values
-val.to_csv('cat_valid.csv', float_format='%.6f', index=False)
+val.to_csv('andy_cat_valid.csv', float_format='%.6f', index=False)
 
 # Create submission file
 sub = pd.DataFrame()
 sub['id'] = id_test
 sub['target'] = y_test_pred
-sub.to_csv('cat_submit.csv', float_format='%.6f', index=False)
+sub.to_csv('andy_cat_submit.csv', float_format='%.6f', index=False)
 
