@@ -191,6 +191,9 @@ for fold_, (trn_idx, val_idx) in enumerate(folds.split(target, target)):
                         subsample=.8, 
                         colsample_bytree=.8,
                         gamma=1,
+                        gpu_id=0,
+                        max_bin=16,
+                        tree_method='gpu_hist',
                         reg_alpha=0,
                         reg_lambda=1,
                         nthread=2)
