@@ -546,4 +546,4 @@ y_pred = stack.fit_predict(train, target_train, test, id_train)
 sub = pd.DataFrame()
 sub['id'] = id_test
 sub['target'] = y_pred
-sub.to_csv('mybase_test.csv', index=False)
+sub.to_csv('mybase_submit.csv', index=False)
