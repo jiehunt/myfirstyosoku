@@ -21,6 +21,8 @@ from random import choice
 from scipy.stats import randint as sp_randint
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_auc_score
+import warnings
+warnings.filterwarnings("ignore")
 
 np.random.seed(17)
 
@@ -228,6 +230,8 @@ pred_df = pd.DataFrame({"id": df_tt['id'].values})
 target = np.zeros(df_tt.shape[0])
 
 lgb_s = lgb.Dataset(X, Y)
+train_target = pd.DataFrame()
+train_target = np.zeros(X.shape[0])
 for i in range(0, len(prms_list)):
     print ("Set {}".format(i))
     print ("training...")
@@ -236,11 +240,18 @@ for i in range(0, len(prms_list)):
                       num_boost_round = 10)
     print ("predicting...")
     y_pred = model.predict(X_tt)
+    y_train_pred = model.predict(X)
     print ("arrays addition...")
     target = np.add(target, y_pred*weights[i])
+    train_target = np.add(train_target, y_train_pred*weights[i])
     print ("done")
     print ("")
     gc.collect()
-    
+
+train_res = pd.DataFrame({"id": df_tn_z['id'].values})
+train_res['target'] = train_target
+pred_df.to_csv("ievgen_valid.csv", index = False)
+
 pred_df['target'] = target
-pred_df.to_csv("lgbm_5m.csv", index = False)
+# pred_df.to_csv("lgbm_5m.csv", index = False)
+pred_df.to_csv("ievgen_submit.csv", index = False)
