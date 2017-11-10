@@ -104,8 +104,8 @@ def target_encode(trn_series=None,  # Revised to encode validation series
 
 
 # Read data
-train_df = pd.read_csv('../train/train.csv', na_values="-1")  # .iloc[0:200,:]
-test_df = pd.read_csv('../test/test.csv', na_values="-1")
+train_df = pd.read_csv('../input/train.csv', na_values="-1")  # .iloc[0:200,:]
+test_df = pd.read_csv('../input/test.csv', na_values="-1")
 
 # from olivier
 train_features = [
@@ -256,10 +256,10 @@ print(eval_gini(y, y_valid_pred))
 val = pd.DataFrame()
 val['id'] = id_train
 val['target'] = y_valid_pred.values
-val.to_csv('xgb_valid.csv', float_format='%.6f', index=False)
+val.to_csv('andy_xgb_valid.csv', float_format='%.6f', index=False)
 
 # Create submission file
 sub = pd.DataFrame()
 sub['id'] = id_test
 sub['target'] = y_test_pred
-sub.to_csv('xgb_submit.csv', float_format='%.6f', index=False)
+sub.to_csv('andy_xgb_submit.csv', float_format='%.6f', index=False)
