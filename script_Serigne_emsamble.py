@@ -24,8 +24,8 @@ from glob import glob
 
 #Read csv files
 
-files = "model_valid/*"
-testres_files = "model_testres/*"
+files = "model_submit/*"
+testres_files = "model_submit/*"
 # glob_files = sys.argv[1]
 
 testres_files = []
@@ -34,8 +34,7 @@ df_model = []
 path_model = []
 for i, file in enumerate(glob(files)):
     file_name = str(file)
-    if file.endswith("submit.csv"):
-        testres_files.append(file_name)
+    testres_files.append(file_name)
         # res = pd.read_csv(file_name)
         # path_model.append(str(file))
         # df_model.append(res)
@@ -47,7 +46,7 @@ print(testres_files)
 # Froza_and_Pascal = pd.read_csv('../input/forza-and-pascal/Froza_and_Pascal.csv')
 # median_rank_submission = pd.read_csv('../input/median-rank-submission/median_rank_submission.csv')
 
-# stacked_1 = pd.read_csv('./model_valid/andy_xgb_submit.csv')
+stacked_1 = pd.read_csv('./model_valid/andy_xgb_submit.csv')
 # xgb_submit = pd.read_csv('./model_valid/mybase_submit.csv')
 # Froza_and_Pascal = pd.read_csv('./model_valid/Keui_submit.csv')
 # median_rank_submission = pd.read_csv('./model_valid/ievgen_submit.csv')
@@ -56,7 +55,7 @@ print(testres_files)
 # preds = pd.concat([stacked_1['target'], xgb_submit['target'],
 #         Froza_and_Pascal['target'], median_rank_submission['target']])
 
-stacked_1 = pd.read_csv('./model_valid/andy_xgb_submit.csv')
+# stacked_1 = pd.read_csv('./model_valid/andy_xgb_submit.csv')
 for i, file in enumerate(testres_files):
     print("Parsing:  ",str(i), "  ", str(file))
     res = pd.read_csv(file)
@@ -65,7 +64,7 @@ for i, file in enumerate(testres_files):
         continue
     preds = pd.concat([preds,res['target']])
 
-preds.to_csv("temp.csv",index=False)
+# preds.to_csv("temp.csv",index=False)
 print(preds.describe())
 
 #Apply harmonic mean
