@@ -932,9 +932,14 @@ def main():
     strdirectory = '../input/'
     gptrain, gptest = GetData(strdirectory)
     print('GPAri Gini Score:', GiniScore(gptrain.target,GPAri(gptrain)))
+    pred = pd.read_csv(strdirectory+'train.csv')
+    pred.target = GPAri(gptrain).ravel()
+    columns = ['id', 'target']
+    pred = pred[columns]
+    pred.to_csv('gp_valid.csv',index=None,float_format='%.6f')
     basic = pd.read_csv(strdirectory+'sample_submission.csv')
     basic.target = GPAri(gptest).ravel()
-    basic.to_csv('gpari.csv',index=None,float_format='%.6f')
+    basic.to_csv('gp_submit.csv',index=None,float_format='%.6f')
     print('Finished')
 
 
